@@ -6,17 +6,20 @@ class Loadfile{
     public $filepath = __DIR__."/csv_alterado.csv";
     public $connection;
     public $sql;
-
+    private $username="root";
+    private $passwd="123";
+    private $database="loadfile";
+    private $table="csvdata";
 
     function __construct()
     {
-        $this->connection = new PDO("mysql:host=localhost;dbname=loadfile", "root", "123", array(
+        $this->connection = new PDO("mysql:host=localhost;dbname=".$this->database, $this->username, $this->passwd, array(
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
             PDO::MYSQL_ATTR_LOCAL_INFILE => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ));
         $this->sql = <<<SQL
-LOAD DATA LOCAL INFILE '{$this->filepath}' INTO TABLE csvdata FIELDS TERMINATED BY ';' ENCLOSED BY '"' LINES TERMINATED BY '\\n' IGNORE 1 ROWS (id,nome,telefone,@created_at,updated_at) 
+LOAD DATA LOCAL INFILE '{$this->filepath}' INTO TABLE {$this->table} FIELDS TERMINATED BY ';' ENCLOSED BY '"' LINES TERMINATED BY '\\n' IGNORE 1 ROWS (id,nome,telefone,@created_at,updated_at) 
 SET created_at = IF(CHAR_LENGTH(TRIM(@created_at)) = 0
                           OR
                           TRIM(@created_at) = NULL, NOW(), @created_at);
